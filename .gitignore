@@ -1,0 +1,20 @@
+# Roblox Studio files
+*.rbxl
+*.rbxlx
+*.rbxm
+*.rbxmx
+
+# Rojo files
+/rojo-test.rbxl
+/rojo-test.rbxlx
+
+# Packages directory
+/Packages/
+
+# IDE files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db 

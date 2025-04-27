@@ -1,0 +1,25 @@
+{
+    "name": "SimpleDialogue testing",
+    "tree": {
+      "$className": "DataModel",
+      "ReplicatedStorage": {
+        "$className": "ReplicatedStorage",
+        "SimpleDialogue": {
+            "$path": "src",
+            "Packages": {
+                "$path": "Packages"
+            }
+        }
+      },
+      "StarterPlayer": {
+          "$className": "StarterPlayer",
+          "StarterPlayerScripts": {
+              "$className": "StarterPlayerScripts",
+              "Testing": {
+                "$path": "testing"
+              }
+          }
+      }
+    }
+    
+  } 
