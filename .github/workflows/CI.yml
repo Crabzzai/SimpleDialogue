@@ -20,6 +20,12 @@ jobs:
       - name: Install Foreman Toolchains
         run: foreman install
 
+      - name: Setup Aftman
+        uses: ok-nick/setup-aftman@v0.4.2
+
+      - name: Install Aftman Toolchains
+        run: aftman install
+
       - name: Install Dependencies
         run: wally install
 
@@ -77,6 +83,12 @@ jobs:
 
       - name: Install Foreman Toolchains
         run: foreman install
+
+      - name: Setup Aftman
+        uses: ok-nick/setup-aftman@v0.4.2
+
+      - name: Install Aftman Toolchains
+        run: aftman install
 
       - name: Run Stylua
         run: stylua src --check
