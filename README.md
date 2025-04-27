@@ -2,6 +2,8 @@
 
 A dialogue system for Roblox games. Makes it easy to create NPCs with interactive dialogues, quests, and shops.
 
+Docs: https://crabzzai.github.io/SimpleDialogue/
+
 ## Features
 
 - Easy-to-use API for creating dialogue trees
@@ -13,7 +15,7 @@ A dialogue system for Roblox games. Makes it easy to create NPCs with interactiv
 1. Install with Wally:
 ```toml
 [dependencies]
-SimpleDialogue = "crabzzai/simple-dialogue@0.1.0"
+SimpleDialogue = "crabzzai/simpledialogue@0.1.0"
 ```
 
 ## Development
