@@ -27,19 +27,16 @@ jobs:
         run: mkdir -p Packages
 
       - name: Run Stylua
-        run: stylua lib --check
+        run: stylua src --check
 
-      - name: Run Selene
-        run : selene lib
+      - name: Build SimpleDialogue.rbxm
+        run: rojo build -o SimpleDialogue.rbxm pack.project.json
 
-      - name: Build pack.rbxm
-        run: rojo build -o pack.rbxm pack.project.json
-
-      - name: Upload pack.rbxm as build artifact
+      - name: Upload SimpleDialogue.rbxm as build artifact
         uses: actions/upload-artifact@v4
         with: 
-          name: hello_world
-          path: pack.rbxm
+          name: SimpleDialogue
+          path: SimpleDialogue.rbxm
 
       - name: Get Release from wally.toml
         uses: SebRollen/toml-action@v1.0.0
