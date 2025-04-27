@@ -82,7 +82,7 @@ jobs:
         run: foreman install
 
       - name: Run Stylua
-        run: stylua lib --check
+        run: stylua src --check
 
       - name: Install Dependencies
         run: wally install
