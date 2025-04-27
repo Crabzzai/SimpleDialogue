@@ -3,7 +3,7 @@
 registry = "test"
 
 [[package]]
-name = "crabzzai/simple-dialogue"
+name = "crabzzai/simpledialogue"
 version = "0.1.0"
 dependencies = [["Fusion", "elttob/fusion@0.2.0"]]
 
