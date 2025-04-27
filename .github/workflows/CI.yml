@@ -8,10 +8,9 @@ jobs:
     if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
 
-
     steps:
       - name: Checkout Main
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Foreman
         uses: Roblox/setup-foreman@v1
@@ -37,7 +36,7 @@ jobs:
         run: rojo build -o pack.rbxm pack.project.json
 
       - name: Upload pack.rbxm as build artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with: 
           name: hello_world
           path: pack.rbxm
@@ -49,12 +48,11 @@ jobs:
           file: 'wally.toml'
           field: 'package.version'
 
-
       - name: Publish to Wally
         env: 
           WALLY_TOKEN: ${{ secrets.WALLY_AUTH_TOKEN }}
         run: |
-          mkdir =p ~/.wally
+          mkdir -p ~/.wally
           printf "[tokens]\n\"https://api.wally.run/\" = \"%s\"" "$WALLY_TOKEN" >> ~/.wally/auth.toml
           wally publish
 
@@ -73,7 +71,7 @@ jobs:
 
     steps:
       - name: Checkout development
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Foreman
         uses: Roblox/setup-foreman@v1
@@ -99,13 +97,13 @@ jobs:
         run: rojo build -o testing.rbxl testing.project.json
 
       - name: Upload SimpleDialogue.rbxm as build artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with: 
           name: SimpleDialogue
           path: SimpleDialogue.rbxm
 
       - name: Upload testing.rbxl as build artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with: 
           name: SimpleDialogue_Testing_Place
           path: testing.rbxl
