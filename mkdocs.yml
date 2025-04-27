@@ -1,6 +1,9 @@
-site_name: SimpleDialogue
+site_name: "SimpleDialogue"
+site_url: https://crabzzai.github.io/simpledialogue/
 site_description: A dialogue system for Roblox games
-repo_url: https://github.com/crabzzai/SimpleDialogue
+repo_url: https://github.com/crabzzai/simpledialogue
+repo_name: crabzzai/simpledialogue
+
 theme:
   name: material
   palette:
