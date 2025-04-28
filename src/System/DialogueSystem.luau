@@ -207,13 +207,13 @@ function DialogueSystem.SetupUI(self: DialogueSystem)
 	if not SharedFloatingPart then
 		SharedFloatingPart = Instance.new("Part")
 		if SharedFloatingPart then
-            SharedFloatingPart.Name = "DialogueFloatingPart"
-            SharedFloatingPart.Anchored = true
-            SharedFloatingPart.CanCollide = false
-            SharedFloatingPart.Transparency = 1
-            SharedFloatingPart.Size = Vector3.new(4, 2, 0.2)
-            SharedFloatingPart.Parent = workspace
-        end
+			SharedFloatingPart.Name = "DialogueFloatingPart"
+			SharedFloatingPart.Anchored = true
+			SharedFloatingPart.CanCollide = false
+			SharedFloatingPart.Transparency = 1
+			SharedFloatingPart.Size = Vector3.new(4, 2, 0.2)
+			SharedFloatingPart.Parent = workspace
+		end
 	end
 
 	if (not SharedPlayerTextPart or not SharedPlayerTextPart.Parent) and self.character then
@@ -280,7 +280,7 @@ function DialogueSystem.StartUpdateLoops(self: DialogueSystem)
 			local distance = (rootPos - npcPos).Magnitude
 
 			local proximityDistance = (self.config.proximityDistance or DEFAULT_CONFIG.proximityDistance) :: number
-			local shouldEndDialogue = self.currentNode 
+			local shouldEndDialogue = self.currentNode
 				and self.currentNode.options
 				and self.currentNode.options[1]
 				and self.currentNode.options[1].shouldEndDialogue ~= false
