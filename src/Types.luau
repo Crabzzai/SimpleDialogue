@@ -92,7 +92,7 @@ export type DialogueSystem = {
 	ClearOptions: (self: DialogueSystem) -> (),
 	CreateNPC: (self: DialogueSystem, npcModel: Model) -> NPC,
 	StartDialogue: (self: DialogueSystem, npc: NPC, dialogueTree: DialogueTree) -> (),
-	DisplayNode: (self: DialogueSystem, node: DialogueNode) -> (),
+	DisplayNode: (self: DialogueSystem, node: DialogueNode | number) -> (),
 	ShowPlayerText: (self: DialogueSystem, text: string) -> (),
 	ShowNPCText: (self: DialogueSystem, text: string, callback: (() -> ())?) -> (),
 	SetConfiguration: (self: DialogueSystem, config: DialogueConfig) -> (),

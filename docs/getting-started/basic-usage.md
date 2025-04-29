@@ -81,6 +81,10 @@ local dialogueTree = SimpleDialogue.CreateTree({
     SimpleDialogue.CreateNode("Welcome to our village! First time visiting?", {
         SimpleDialogue.CreateOption("Yes, it's my first time", nil, 2), -- Go to node at index 2
         SimpleDialogue.CreateOption("No, I've been here before", nil, 3), -- Go to node at index 3
+        SimpleDialogue.CreateOption("No, I've been here before", function()
+            task.wait(5)
+            dialogue:DisplayNode(4) -- Manually change node in the callback
+        end, 0), -- 0 means clearing the options, without ending the dialogue.
         SimpleDialogue.CreateOption("Goodbye", nil, -1) -- -1 means end dialogue
     }),
     
@@ -90,6 +94,11 @@ local dialogueTree = SimpleDialogue.CreateTree({
     }),
     
     -- Third node (index 3)
+    SimpleDialogue.CreateNode("Nice to see you again!", {
+        SimpleDialogue.CreateOption("Good to be back", nil, -1)
+    })
+
+    -- Third node (index 4)
     SimpleDialogue.CreateNode("Nice to see you again!", {
         SimpleDialogue.CreateOption("Good to be back", nil, -1)
     })

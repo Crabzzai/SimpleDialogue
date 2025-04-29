@@ -423,33 +423,52 @@ function DialogueSystem.StartDialogue(self: DialogueSystem, npc: NPC, dialogueTr
 	end
 end
 
-function DialogueSystem.DisplayNode(self: DialogueSystem, node: DialogueNode)
+function DialogueSystem.DisplayNode(self: DialogueSystem, node: DialogueNode | number)
 	if not node then
 		warn("Attempted to display nil dialogue node")
 		return
 	end
 
-	self.currentNode = node
-	self:ClearOptions()
+	local _node: DialogueNode?
 
-	if node.onEnter then
-		task.spawn(node.onEnter)
+	if type(node) == "number" then
+		local dialogueTree = self.npc and self.npc.dialogueTree
+		if dialogueTree and dialogueTree[node] then
+			_node = dialogueTree[node]
+		else
+			warn("Invalid node index:", node)
+			return
+		end
+	else
+		_node = node
 	end
 
-	local isAutoAdvanceNode = node.options
-		and #node.options == 1
-		and (node.options[1].text == "" or node.options[1].autoAdvance)
-		and (node.options[1].next == -1 or node.options[1].autoAdvance)
+	if not _node then
+		warn("Invalid node provided")
+		return
+	end
 
-	if not node.options or #node.options == 0 or isAutoAdvanceNode then
-		if not node.options or #node.options == 0 then
+	self.currentNode = _node
+	self:ClearOptions()
+
+	if _node.onEnter then
+		task.spawn(_node.onEnter)
+	end
+
+	local isAutoAdvanceNode = _node.options
+		and #_node.options == 1
+		and (_node.options[1].text == "" or _node.options[1].autoAdvance)
+		and (_node.options[1].next == -1 or _node.options[1].autoAdvance)
+
+	if not _node.options or #_node.options == 0 or isAutoAdvanceNode then
+		if not _node.options or #_node.options == 0 then
 			warn("No options provided for dialogue node")
 		end
 
 		if isAutoAdvanceNode then
-			self:ShowNPCText(node.text, function()
-				if node.options and node.options[1] and node.options[1].callback then
-					local callback = node.options[1].callback
+			self:ShowNPCText(_node.text, function()
+				if _node.options and _node.options[1] and _node.options[1].callback then
+					local callback = _node.options[1].callback
 					if callback then
 						task.spawn(function()
 							callback()
@@ -457,9 +476,9 @@ function DialogueSystem.DisplayNode(self: DialogueSystem, node: DialogueNode)
 					end
 				end
 
-				local shouldEndDialogue = node.options
-					and node.options[1]
-					and node.options[1].shouldEndDialogue ~= false
+				local shouldEndDialogue = _node.options
+					and _node.options[1]
+					and _node.options[1].shouldEndDialogue ~= false
 
 				print("Should end dialogue:", shouldEndDialogue)
 
@@ -473,13 +492,13 @@ function DialogueSystem.DisplayNode(self: DialogueSystem, node: DialogueNode)
 				text = "Continue",
 				next = -1,
 			}
-			node.options = { continueOption }
+			_node.options = { continueOption }
 		end
 	end
 
 	if self.currentNPC and self.currentNPC.FloatingText then
-		self:ShowNPCText(node.text, function()
-			for i, option in ipairs(node.options) do
+		self:ShowNPCText(_node.text, function()
+			for i, option in ipairs(_node.options) do
 				local button = DialogueUI.CreateOptionButton(option.text, {
 					template = self.frame and self.frame:FindFirstChild("Template") :: Frame?,
 					optionsFrame = self.frame,
@@ -507,7 +526,9 @@ function DialogueSystem.DisplayNode(self: DialogueSystem, node: DialogueNode)
 										end)
 									end
 
-									if option.next == -1 then
+									if option.next == 0 then
+										self:ClearOptions()
+									elseif option.next == -1 then
 										self:EndDialogue()
 									elseif type(option.next) == "number" then
 										local nextNode = self.npc
@@ -540,7 +561,9 @@ function DialogueSystem.DisplayNode(self: DialogueSystem, node: DialogueNode)
 									end)
 								end
 
-								if option.next == -1 then
+								if option.next == 0 then
+									self:ClearOptions()
+								elseif option.next == -1 then
 									self:EndDialogue()
 								elseif type(option.next) == "number" then
 									local nextNode = self.npc
@@ -971,8 +994,6 @@ function DialogueSystem.ShowNPCText(self: DialogueSystem, text: string, callback
 	FloatingTextUI.Show(self.currentNPC.FloatingText)
 
 	local textSpeed = self.config.textSpeed or DEFAULT_CONFIG.textSpeed
-	local autoAdvance = self.config.autoAdvance or DEFAULT_CONFIG.autoAdvance
-	local autoAdvanceDelay = self.config.autoAdvanceDelay or DEFAULT_CONFIG.autoAdvanceDelay
 
 	local currentText = ""
 	local textLength = string.len(text)
@@ -989,9 +1010,7 @@ function DialogueSystem.ShowNPCText(self: DialogueSystem, text: string, callback
 		if currentCharIndex < textLength then
 			task.delay(textSpeed, addNextChar)
 		else
-			if autoAdvance and callback then
-				task.delay(autoAdvanceDelay, callback)
-			elseif callback then
+			if callback then
 				task.spawn(callback)
 			end
 		end
