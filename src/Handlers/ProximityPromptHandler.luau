@@ -91,8 +91,10 @@ local function initializePromptHandling()
 			promptData.fadeOutTask = nil
 		end
 
-		if not promptData.highlight and prompt.Parent and prompt.Parent:IsA("Model") then
-			promptData.highlight = createHighlight(prompt.Parent :: Model)
+		if not promptData.highlight and prompt.Parent then
+			promptData.highlight = createHighlight(
+				if prompt.Parent:IsA("Model") then prompt.Parent else (prompt.Parent and prompt.Parent.Parent :: Model)
+			)
 
 			local outlineTransparency = Value(1)
 			local outlineSpring = Spring(outlineTransparency, 25)
@@ -144,7 +146,8 @@ task.spawn(initializePromptHandling)
 function ProximityPromptHandler.Create(npcModel: Model, config: NPCConfig, onTriggered: (() -> ())?)
 	local prompt = Instance.new("ProximityPrompt")
 	prompt.Name = "Prompt"
-	prompt.Parent = npcModel
+	print("Primarypart: ", npcModel.PrimaryPart)
+	prompt.Parent = if npcModel.PrimaryPart then npcModel.PrimaryPart else npcModel
 	prompt.ObjectText = config.objectText or "Talk"
 	prompt.ActionText = config.actionText or "Press E"
 	prompt.HoldDuration = config.holdDuration or 0
