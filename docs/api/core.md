@@ -159,11 +159,12 @@ Displays a specific dialogue node.
 
 **Parameters:**
 
-- `node`: A dialogue node from the tree
+- `node`: A dialogue node from the tree, either a node instance or specific number
 
 **Example:**
 ```lua
 dialogue:DisplayNode(dialogueTree[2]) -- Display the second node
+dialogue:DisplayNode(4) -- Display the fourth node 
 ```
 
 #### `:ShowNPCText(text, callback)`
