@@ -12,7 +12,7 @@ SimpleDialogue is available as a package through [Wally](https://wally.run/), a 
 
 ```toml
 [dependencies]
-SimpleDialogue = "crabzzai/simpledialogue@0.1.3"
+SimpleDialogue = "crabzzai/simpledialogue@0.1.4"
 ```
 
 3. Run `wally install` to install the package.
