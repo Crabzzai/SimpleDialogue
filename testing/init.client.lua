@@ -2,7 +2,9 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local SimpleDialogueModule = ReplicatedStorage:WaitForChild("SimpleDialogue")
+local Packages = ReplicatedStorage:WaitForChild("Packages")
+
+local SimpleDialogueModule = Packages.SimpleDialogue
 local SimpleDialogue = require(SimpleDialogueModule)
 local Types = require(SimpleDialogueModule.Types)
 

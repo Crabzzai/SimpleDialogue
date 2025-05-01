@@ -4,11 +4,14 @@
       "$className": "DataModel",
       "ReplicatedStorage": {
         "$className": "ReplicatedStorage",
-        "SimpleDialogue": {
-            "$path": "src",
+        "Packages": {
+          "$path": "Packages",
+          "SimpleDialogue": {
+            "$path": "default.project.json",
             "Packages": {
-                "$path": "Packages"
+              "$path": "Packages"
             }
+          }
         }
       },
       "StarterPlayer": {
