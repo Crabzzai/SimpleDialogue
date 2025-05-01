@@ -82,15 +82,11 @@ end
 
 local function initializePromptHandling()
 	ProximityPromptService.PromptShown:Connect(function(prompt, inputType)
-		local promptData = (
-			activePrompts[prompt]
-			or {
-				onTriggered = nil,
-				highlight = nil,
-				highlightSpring = nil,
-				fadeOutTask = nil,
-			}
-		) :: PromptData
+		local promptData = activePrompts[prompt]
+
+		if not promptData then
+			return
+		end
 
 		if promptData.fadeOutTask then
 			task.cancel(promptData.fadeOutTask)

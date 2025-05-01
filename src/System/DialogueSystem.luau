@@ -651,8 +651,8 @@ function DialogueSystem.SetDialogueTree(self: DialogueSystem, dialogueTree: Dial
 end
 
 function DialogueSystem.SetOnInteract(self: DialogueSystem, callback: () -> ())
-	if self.currentNPC then
-		self.currentNPC.onInteract = callback
+	if self.npc then
+		self.npc.onInteract = callback
 	end
 end
 
