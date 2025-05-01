@@ -3,7 +3,13 @@
 
 local ProximityPromptService = game:GetService("ProximityPromptService")
 local RunService = game:GetService("RunService")
-local Fusion = require(script.Parent.Parent.Packages.Fusion)
+local Fusion
+local success = pcall(function()
+	Fusion = require(script.Parent.Parent.Packages.Fusion)
+end)
+if not success then
+	Fusion = require(game:GetService("ReplicatedStorage").Packages.Fusion)
+end
 local Types = require(script.Parent.Parent.Types)
 
 type NPCConfig = Types.NPCConfig

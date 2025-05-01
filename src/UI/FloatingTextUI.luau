@@ -1,7 +1,13 @@
 --!strict
 --!optimize 2
 
-local Fusion = require(script.Parent.Parent.Packages.Fusion)
+local Fusion
+local success = pcall(function()
+	Fusion = require(script.Parent.Parent.Packages.Fusion)
+end)
+if not success then
+	Fusion = require(game:GetService("ReplicatedStorage").Packages.Fusion)
+end
 local Types = require(script.Parent.Parent.Types)
 
 local New = Fusion.New
@@ -10,7 +16,6 @@ local Children = Fusion.Children
 type UIConfig = Types.UIConfig
 
 local FloatingTextUI = {}
-
 local partToSurfaceGui = {}
 
 function FloatingTextUI.CreateSurfaceGui(part: Part): SurfaceGui
