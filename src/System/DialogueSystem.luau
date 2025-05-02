@@ -204,61 +204,59 @@ function DialogueSystem.SetupUI(self: DialogueSystem)
 		return
 	end
 
-	if not SharedFloatingPart then
-		SharedFloatingPart = Instance.new("Part")
-		if SharedFloatingPart then
-			SharedFloatingPart.Name = "DialogueFloatingPart"
-			SharedFloatingPart.Anchored = true
-			SharedFloatingPart.CanCollide = false
-			SharedFloatingPart.Transparency = 1
-			SharedFloatingPart.Size = Vector3.new(4, 2, 0.2)
-			SharedFloatingPart.Parent = workspace
-		end
-	end
-
-	if (not SharedPlayerTextPart or not SharedPlayerTextPart.Parent) and self.character then
-		if SharedPlayerTextPart then
-			SharedPlayerTextPart:Destroy()
-			SharedPlayerTextPart = nil
-		end
-
-		local playerTextPart = Instance.new("Part")
-		playerTextPart.Name = "PlayerFloatingTextPart"
-		playerTextPart.Anchored = true
-		playerTextPart.CanCollide = false
-		playerTextPart.Transparency = 1
-		playerTextPart.Size = Vector3.new(2, 0.5, 0.2)
-		playerTextPart.Parent = self.character
-
-		SharedPlayerTextPart = playerTextPart
-
-		if self.rootPart then
-			local rootCFrame: CFrame = self.rootPart.CFrame
-			local playerTextOffset = (self.config.playerTextOffset or DEFAULT_CONFIG.playerTextOffset) :: Vector3
-			playerTextPart.CFrame = rootCFrame * CFrame.new(playerTextOffset)
-		end
-	end
-
-	self.floatingPart = SharedFloatingPart
-
-	if not self.frame or not self.frame.Parent then
+	if not self.config.useScreenGui then
 		if not SharedFloatingPart then
-			error("SharedFloatingPart is nil, cannot create UI")
-			return
+			SharedFloatingPart = Instance.new("Part")
+			if SharedFloatingPart then
+				SharedFloatingPart.Name = "DialogueFloatingPart"
+				SharedFloatingPart.Anchored = true
+				SharedFloatingPart.CanCollide = false
+				SharedFloatingPart.Transparency = 1
+				SharedFloatingPart.Size = Vector3.new(4, 2, 0.2)
+				SharedFloatingPart.Parent = workspace
+			end
 		end
-		local ui = DialogueUI.Create(SharedFloatingPart)
-		if not ui or not ui.frame then
-			error("Failed to create UI elements")
-			return
-		end
-		self.frame = ui.frame
-	end
 
-	if
-		(not self.playerFloatingText or not self.playerFloatingText.frame or not self.playerFloatingText.frame.Parent)
-		and SharedPlayerTextPart
-	then
-		self.playerFloatingText = FloatingTextUI.Create(SharedPlayerTextPart)
+		self.floatingPart = SharedFloatingPart
+
+		if not self.frame or not self.frame.Parent then
+			if not SharedFloatingPart then
+				error("SharedFloatingPart is nil, cannot create UI")
+				return
+			end
+			local ui = DialogueUI.Create(SharedFloatingPart)
+			if not ui or not ui.frame then
+				error("Failed to create UI elements")
+				return
+			end
+			self.frame = ui.frame
+		end
+	else
+		if self.screenGui then
+			self.screenGui:Destroy()
+		end
+
+		self.screenGui = DialogueUI.CreateScreenGui()
+
+		if self.screenGui then
+			local ui = DialogueUI.Create(self.screenGui)
+			if not ui or not ui.frame then
+				error("Failed to create UI elements for ScreenGui")
+				return
+			end
+			self.frame = ui.frame
+			ui.frame.AnchorPoint = Vector2.new(0.5, 0.5)
+			ui.frame.Position = UDim2.new(0.5, 0, 0.5, 0)
+			ui.frame.Visible = false
+
+			if self._screenGuiUpdateConnection then
+				self._screenGuiUpdateConnection:Disconnect()
+			end
+
+			self._screenGuiUpdateConnection = RunService.RenderStepped:Connect(function()
+				self:UpdateScreenGuiPosition()
+			end)
+		end
 	end
 end
 
@@ -331,6 +329,55 @@ function DialogueSystem.UpdateFloatingDisplayPosition(self: DialogueSystem)
 	local finalCFrame = CFrame.lookAt(finalPosition, finalPosition + lookDirection, Vector3.new(0, 1, 0))
 
 	self.floatingPart.CFrame = finalCFrame
+end
+
+function DialogueSystem.UpdateScreenGuiPosition(self: DialogueSystem)
+	if not self.config.useScreenGui or not self.screenGui or not self.frame then
+		return
+	end
+
+	if not self.rootPart or not self.camera then
+		return
+	end
+
+	local playerPos = self.rootPart.Position
+
+	local camCFrame = self.camera.CFrame
+	local camLook = camCFrame.LookVector.Unit
+	local camUp = Vector3.new(0, 1, 0)
+
+	local camRight = camLook:Cross(camUp).Unit
+	local cleanCamUp = camRight:Cross(camLook).Unit
+	local cleanCamCFrame = CFrame.fromMatrix(Vector3.zero, camRight, cleanCamUp)
+
+	local offsetDistance = (self.config.offsetDistance or DEFAULT_CONFIG.offsetDistance) :: number
+	local offset = cleanCamCFrame.RightVector * offsetDistance
+	local worldPos = playerPos + offset
+
+	local screenPos, isOnScreen = self.camera:WorldToScreenPoint(worldPos)
+
+	if isOnScreen then
+		self.frame.AnchorPoint = Vector2.new(0, 0.5)
+		self.frame.Position = UDim2.new(0, screenPos.X, 0, screenPos.Y)
+
+		local buttonWidth = 200
+		local buttonHeight = 40
+
+		local template = self.frame:FindFirstChild("Template")
+		if template and template:IsA("Frame") then
+			template.Size = UDim2.fromOffset(buttonWidth, buttonHeight)
+		end
+
+		for _, child in ipairs(self.frame:GetChildren()) do
+			if child:IsA("Frame") and child.Name ~= "Template" then
+				child.Size = UDim2.fromOffset(buttonWidth, buttonHeight)
+			end
+		end
+
+		self.frame.Visible = true
+	else
+		self.frame.Visible = false
+	end
 end
 
 function DialogueSystem.CreateNPC(self: DialogueSystem, npcModel: Model): NPC
@@ -677,9 +724,17 @@ function DialogueSystem.EndDialogue(self: DialogueSystem)
 	self.floatingPart = nil
 
 	self:ClearOptions()
+
+	if self.config.useScreenGui and self.screenGui then
+		self.screenGui:Destroy()
+		self.screenGui = nil
+		if self._screenGuiUpdateConnection then
+			self._screenGuiUpdateConnection:Disconnect()
+			self._screenGuiUpdateConnection = nil
+		end
+	end
+
 	self.isDialogueActive = false
-	self.currentNode = nil :: any
-	self.currentNodeIndex = nil
 
 	if not hasRemainingDisplayTime then
 		if self._playerUpdateConnection then

@@ -115,11 +115,33 @@ function DialogueUI.CreateSurfaceGui(part: Part): SurfaceGui
 	) :: SurfaceGui
 end
 
-function DialogueUI.Create(part: Part): { frame: Frame, template: Frame }
-	local ui = {}
-	local surfaceGui = DialogueUI.CreateSurfaceGui(part)
+function DialogueUI.CreateScreenGui(): ScreenGui
+	local existingGui = game.Players.LocalPlayer.PlayerGui:FindFirstChild("DialogueGui")
+	if existingGui and existingGui:IsA("ScreenGui") then
+		return existingGui
+	end
 
-	local existingPriorityFrame = surfaceGui:FindFirstChild("PriorityFrame")
+	return (
+		New("ScreenGui")({
+			Name = "DialogueGui",
+			Parent = game.Players.LocalPlayer.PlayerGui,
+			ResetOnSpawn = false,
+			ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
+		})
+	) :: ScreenGui
+end
+
+function DialogueUI.Create(inst: Part | ScreenGui): { frame: Frame, template: Frame }
+	local ui = {}
+
+	local gui: GuiBase
+	if inst:IsA("ScreenGui") then
+		gui = inst
+	else
+		gui = DialogueUI.CreateSurfaceGui(inst)
+	end
+
+	local existingPriorityFrame = gui:FindFirstChild("PriorityFrame")
 
 	if existingPriorityFrame and existingPriorityFrame:IsA("Frame") then
 		local existingOptionsFrame = existingPriorityFrame:FindFirstChild("OptionsFrame")
@@ -138,15 +160,15 @@ function DialogueUI.Create(part: Part): { frame: Frame, template: Frame }
 		BackgroundTransparency = 1,
 		Size = UDim2.fromScale(1, 1),
 		ZIndex = 5,
-		Parent = surfaceGui,
+		Parent = gui,
 	})
 
 	ui.frame = New("Frame")({
 		Name = "OptionsFrame",
 		BackgroundTransparency = 1,
 		Size = UDim2.fromOffset(200, 0),
-		Position = UDim2.fromScale(0, 0.5),
-		AnchorPoint = Vector2.new(0, 0.5),
+		Position = UDim2.fromScale(if gui:IsA("ScreenGui") then 0.5 else 0, 0.5),
+		AnchorPoint = Vector2.new(if gui:IsA("ScreenGui") then 0.5 else 0, 0.5),
 		AutomaticSize = Enum.AutomaticSize.Y,
 		SizeConstraint = Enum.SizeConstraint.RelativeXY,
 		Parent = priorityFrame,

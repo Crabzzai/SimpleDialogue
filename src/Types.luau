@@ -27,6 +27,7 @@ export type DialogueConfig = {
 	offsetDistance: number?,
 	playerTextDisplayDuration: number?,
 	playerTextOffset: Vector3?,
+	useScreenGui: boolean?,
 }
 
 export type PromptConfig = {
@@ -75,6 +76,7 @@ export type DialogueSystem = {
 	options: { any },
 	frame: Frame?,
 	floatingPart: Part?,
+	screenGui: ScreenGui?,
 	currentNode: DialogueNode?,
 	currentNodeIndex: number?,
 	isDialogueActive: boolean,
@@ -83,11 +85,13 @@ export type DialogueSystem = {
 	playerFloatingText: { frame: Frame?, textLabel: TextLabel? }?,
 	_playerUpdateConnection: RBXScriptConnection?,
 	_distanceCheckConnection: RBXScriptConnection?,
+	_screenGuiUpdateConnection: RBXScriptConnection?,
 
 	Initialize: (self: DialogueSystem) -> (),
 	SetupUI: (self: DialogueSystem) -> (),
 	StartUpdateLoops: (self: DialogueSystem) -> (),
 	UpdateFloatingDisplayPosition: (self: DialogueSystem) -> (),
+	UpdateScreenGuiPosition: (self: DialogueSystem) -> (),
 	UpdateFloatingDisplaySize: (self: DialogueSystem) -> (),
 	ClearOptions: (self: DialogueSystem) -> (),
 	CreateNPC: (self: DialogueSystem, npcModel: Model) -> NPC,

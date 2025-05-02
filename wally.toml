@@ -1,6 +1,6 @@
 [package]
 name = "crabzzai/simpledialogue"
-version = "0.1.7"
+version = "0.1.8"
 registry = "https://github.com/UpliftGames/wally-index"
 realm = "shared"
 
