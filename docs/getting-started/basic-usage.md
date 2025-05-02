@@ -145,6 +145,7 @@ dialogue:SetConfiguration({
     autoAdvance = false,          -- Whether to auto-advance dialogue
     proximityDistance = 10,       -- Maximum distance before dialogue ends
     offsetDistance = 2,           -- UI offset distance
+    useScreenGui = true,          -- Whether to have the dialogue in PlayerGui or on SurfaceGui
 })
 ```
 
