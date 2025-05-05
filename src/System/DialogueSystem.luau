@@ -360,7 +360,7 @@ function DialogueSystem.UpdateScreenGuiPosition(self: DialogueSystem)
 		self.frame.AnchorPoint = Vector2.new(0, 0.5)
 		self.frame.Position = UDim2.new(0, screenPos.X, 0, screenPos.Y)
 
-		local buttonWidth = 200
+		local buttonWidth = 450
 		local buttonHeight = 40
 
 		local template = self.frame:FindFirstChild("Template")
