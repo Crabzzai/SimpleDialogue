@@ -155,23 +155,15 @@ function DialogueUI.Create(inst: Part | ScreenGui): { frame: Frame, template: Fr
 		end
 	end
 
-	local priorityFrame = New("Frame")({
-		Name = "PriorityFrame",
-		BackgroundTransparency = 1,
-		Size = UDim2.fromScale(1, 1),
-		ZIndex = 5,
-		Parent = gui,
-	})
-
 	ui.frame = New("Frame")({
 		Name = "OptionsFrame",
 		BackgroundTransparency = 1,
-		Size = UDim2.fromOffset(200, 0),
+		Size = UDim2.fromOffset(450, 0),
 		Position = UDim2.fromScale(if gui:IsA("ScreenGui") then 0.5 else 0, 0.5),
 		AnchorPoint = Vector2.new(if gui:IsA("ScreenGui") then 0.5 else 0, 0.5),
 		AutomaticSize = Enum.AutomaticSize.Y,
 		SizeConstraint = Enum.SizeConstraint.RelativeXY,
-		Parent = priorityFrame,
+		Parent = gui,
 		ZIndex = 10,
 
 		[Children] = {
