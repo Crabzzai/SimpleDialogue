@@ -12,14 +12,6 @@ jobs:
       - name: Checkout Main
         uses: actions/checkout@v4
 
-      - name: Setup Foreman
-        uses: Roblox/setup-foreman@v1
-        with: 
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Install Foreman Toolchains
-        run: foreman install
-
       - name: Setup Aftman
         uses: ok-nick/setup-aftman@v0.4.2
 
@@ -75,14 +67,6 @@ jobs:
     steps:
       - name: Checkout development
         uses: actions/checkout@v4
-
-      - name: Setup Foreman
-        uses: Roblox/setup-foreman@v1
-        with: 
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Install Foreman Toolchains
-        run: foreman install
 
       - name: Setup Aftman
         uses: ok-nick/setup-aftman@v0.4.2
