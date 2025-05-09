@@ -18,7 +18,7 @@ Docs: https://crabzzai.github.io/SimpleDialogue/
 1. Install with Wally:
 ```toml
 [dependencies]
-SimpleDialogue = "crabzzai/simpledialogue@0.1.8"
+SimpleDialogue = "crabzzai/simpledialogue@0.2.0"
 ```
 
 ## Development

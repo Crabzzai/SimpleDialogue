@@ -65,6 +65,29 @@ function SimpleDialogue.CreateAutoNode(text: string, callback: (() -> ())?, shou
 	}
 end
 
+function SimpleDialogue.CreateCondition<T>(
+	condition: boolean | (() -> boolean),
+	item: T,
+	failCallback: (() -> ())?
+): T & { condition: (() -> boolean)? }
+	local conditionFunc = if typeof(condition) == "boolean"
+		then function()
+			return condition
+		end
+		else condition
+
+	-- Add the condition to the item
+	local result = item :: any
+	result.condition = conditionFunc
+
+	-- Add failCallback if provided
+	if failCallback then
+		result.failCallback = failCallback
+	end
+
+	return result
+end
+
 function SimpleDialogue.CreateTree(nodes: { DialogueNode }): DialogueTree
 	for _, node in ipairs(nodes) do
 		node.dialogueTree = nodes

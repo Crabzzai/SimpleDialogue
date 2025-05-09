@@ -131,6 +131,54 @@ local dialogueTree = SimpleDialogue.CreateTree({
 })
 ```
 
+## Using Conditions
+
+You can create some conditions for both options and nodes, these nodes will only be shown if that certain condition is met, and the same with nodes, they will only be available when certain condition is met.
+
+```lua
+local beenHereBefore = false
+
+local dialogueTree = SimpleDialogue.CreateTree({
+    -- First node (index 1)
+    SimpleDialogue.CreateNode("Welcome to our village! First time visiting?", {
+        SimpleDialogue.CreateOption("Yes, it's my first time", nil, 2),
+        -- This is a dynamic condition, as soon as `beenHereBefore` changes value to true, this option will be shown.
+        SimpleDialogue.CreateCondition(
+            function()
+                return beenHereBefore
+            end,
+            SimpleDialogue.CreateOption("No, I've been here before", nil, 3)
+        ),
+        SimpleDialogue.CreateOption("Goodbye", nil, -1)
+    }),
+    
+    -- Second node (index 2)
+    -- A static condition, this condition is determined when it's defined, and will not change.
+    SimpleDialogue.CreateCondition(
+        1 == 1,
+        SimpleDialogue.CreateNode("Welcome to our village! First time visiting?", {
+            SimpleDialogue.CreateOption("Yes, it's my first time", nil, 2),
+            SimpleDialogue.CreateOption("No, I've been here before", nil, 3),
+            SimpleDialogue.CreateOption("Goodbye", nil, -1)
+        })
+    ),
+
+    -- Third node (index 3)
+    SimpleDialogue.CreateCondition(
+        function()
+            return beenHereBefore
+        end,
+        SimpleDialogue.CreateAutoNode("Have a good day then!", function()
+            task.wait(5)
+            dialogue:EndDialogue()
+        end, false),
+        function()
+            print("This will run, if the node failed to open.")
+        end
+    ),
+})
+```
+
 ## Configuring DialogueSystem
 
 You can customize various aspects of the dialogue system:

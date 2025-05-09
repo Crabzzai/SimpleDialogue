@@ -7,6 +7,8 @@ export type DialogueOption = {
 	displayText: string?,
 	autoAdvance: boolean?,
 	shouldEndDialogue: boolean?,
+	condition: (() -> boolean)?,
+	failCallback: (() -> ())?,
 }
 
 export type DialogueNode = {
@@ -15,6 +17,8 @@ export type DialogueNode = {
 	dialogueTree: DialogueTree?,
 	onEnter: (() -> ())?,
 	onExit: (() -> ())?,
+	condition: (() -> boolean)?,
+	failCallback: (() -> ())?,
 }
 
 export type DialogueTree = { DialogueNode }

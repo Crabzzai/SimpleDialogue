@@ -91,6 +91,39 @@ local option = SimpleDialogue.CreateOption("Tell me more", function()
 end, 2, "I'm glad you're interested!")
 ```
 
+#### `SimpleDialogue.CreateCondition(condition, item, failCallback)`
+
+Creates a dialogue option for a node.
+
+**Parameters:**
+
+- `condition`: The condition to be met (boolean | function)
+
+- `item`: The item the condition is about (DialogueNode | DialogueOption)
+
+- `failCallback`: Callback function if a node failed to open (function, optional)
+
+**Returns:**
+- A dialogue option object
+
+**Example:**
+```lua
+local beenHereBefore = false
+
+local node = SimpleDialogue.CreateCondition(
+    function()
+        return beenHereBefore
+    end,
+    SimpleDialogue.CreateAutoNode("Have a good day then!", function()
+        task.wait(5)
+        dialogue:EndDialogue()
+    end, false),
+    function()
+        print("This will run, if the node failed to open.")
+    end
+),
+```
+
 #### `SimpleDialogue.CreateTree(nodes)`
 
 Creates a complete dialogue tree from a collection of nodes.

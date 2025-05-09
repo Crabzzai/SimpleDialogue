@@ -62,9 +62,11 @@ local function TestBasicDialogue(): DialogueSystem
     
     local dialogueTree: DialogueTree = SimpleDialogue.CreateTree({
         SimpleDialogue.CreateNode("Hey there!", {
-            SimpleDialogue.CreateOption("Hi!", function()
-                print("Player said hi")
-            end, -1, "HELLO!"),
+            SimpleDialogue.CreateCondition(1 == 2, 
+                SimpleDialogue.CreateOption("Hi!", function()
+                    print("Player said hi")
+                end, -1, "HELLO!")
+            ),
             SimpleDialogue.CreateOption("Bye!", function()
                 print("Player said bye")
             end, -1)
