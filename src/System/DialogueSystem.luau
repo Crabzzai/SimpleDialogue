@@ -495,6 +495,15 @@ function DialogueSystem.DisplayNode(self: DialogueSystem, node: DialogueNode | n
 		return
 	end
 
+	if _node.condition and not _node.condition() then
+		if _node.failCallback then
+			task.spawn(_node.failCallback)
+		end
+
+		self:EndDialogue()
+		return
+	end
+
 	self.currentNode = _node
 	self:ClearOptions()
 
@@ -527,8 +536,6 @@ function DialogueSystem.DisplayNode(self: DialogueSystem, node: DialogueNode | n
 					and _node.options[1]
 					and _node.options[1].shouldEndDialogue ~= false
 
-				print("Should end dialogue:", shouldEndDialogue)
-
 				if shouldEndDialogue then
 					self:EndDialogue()
 				end
@@ -546,6 +553,10 @@ function DialogueSystem.DisplayNode(self: DialogueSystem, node: DialogueNode | n
 	if self.currentNPC and self.currentNPC.FloatingText then
 		self:ShowNPCText(_node.text, function()
 			for i, option in ipairs(_node.options) do
+				if option.condition and not option.condition() then
+					continue
+				end
+
 				local button = DialogueUI.CreateOptionButton(option.text, {
 					template = self.frame and self.frame:FindFirstChild("Template") :: Frame?,
 					optionsFrame = self.frame,
