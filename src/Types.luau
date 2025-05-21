@@ -90,6 +90,7 @@ export type DialogueSystem = {
 	_playerUpdateConnection: RBXScriptConnection?,
 	_distanceCheckConnection: RBXScriptConnection?,
 	_screenGuiUpdateConnection: RBXScriptConnection?,
+	isNPCTyping: boolean?,
 
 	Initialize: (self: DialogueSystem) -> (),
 	SetupUI: (self: DialogueSystem) -> (),

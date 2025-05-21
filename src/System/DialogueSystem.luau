@@ -176,12 +176,20 @@ function DialogueSystem.new(npcModel: Model)
 		}, DialogueSystem) :: any
 	) :: DialogueSystem
 
+	self.player.CharacterAdded:Connect(function(character)
+		self:Initialize()
+	end)
+
 	self.npc = self:CreateNPC(npcModel)
 
 	return self
 end
 
 function DialogueSystem.Initialize(self: DialogueSystem)
+	if ActiveDialogue then
+		ActiveDialogue:EndDialogue()
+	end
+
 	self.character = self.player.Character or self.player.CharacterAdded:Wait()
 	if not self.character then
 		return
@@ -747,106 +755,134 @@ function DialogueSystem.EndDialogue(self: DialogueSystem)
 
 	self.isDialogueActive = false
 
-	if not hasRemainingDisplayTime then
-		if self._playerUpdateConnection then
-			self._playerUpdateConnection:Disconnect()
-			self._playerUpdateConnection = nil
-		end
-	else
-		DialogueSystem.EnsureGlobalPlayerTextUpdate(self)
-	end
-
-	if self._distanceCheckConnection then
-		self._distanceCheckConnection:Disconnect()
-		self._distanceCheckConnection = nil
-	end
-
-	local npcToPreserve = self.currentNPC
-	local npcName = npcToPreserve and npcToPreserve.model.Name or "Unknown"
-	local currentText = npcToPreserve
-			and npcToPreserve.FloatingText
-			and npcToPreserve.FloatingText.textLabel
-			and npcToPreserve.FloatingText.textLabel.Text
-		or ""
-
-	if not _G.__FadingNPCTexts then
-		_G.__FadingNPCTexts = {}
-	end
-
-	if npcToPreserve then
-		_G.__FadingNPCTexts[npcName] = {
-			npc = npcToPreserve,
-			text = currentText,
-			timestamp = tick(),
-		}
-	end
-
-	for _, npc in ipairs(AllNPCs) do
-		if npc._connections and npc._connections.updateConnection then
-			npc._connections.updateConnection:Disconnect()
-			npc._connections.updateConnection = nil
+	local function finishEnd()
+		if not hasRemainingDisplayTime then
+			if self._playerUpdateConnection then
+				self._playerUpdateConnection:Disconnect()
+				self._playerUpdateConnection = nil
+			end
+		else
+			DialogueSystem.EnsureGlobalPlayerTextUpdate(self)
 		end
 
-		if npc.FloatingText and npc.FloatingText.frame then
-			for _, child in ipairs(npc.FloatingText.frame:GetChildren()) do
-				if child:IsA("TextButton") then
-					child:Destroy()
+		if self._distanceCheckConnection then
+			self._distanceCheckConnection:Disconnect()
+			self._distanceCheckConnection = nil
+		end
+
+		local npcToPreserve = self.currentNPC
+		local npcName = npcToPreserve and npcToPreserve.model.Name or "Unknown"
+		local currentText = npcToPreserve
+				and npcToPreserve.FloatingText
+				and npcToPreserve.FloatingText.textLabel
+				and npcToPreserve.FloatingText.textLabel.Text
+			or ""
+
+		if not _G.__FadingNPCTexts then
+			_G.__FadingNPCTexts = {}
+		end
+
+		if npcToPreserve then
+			_G.__FadingNPCTexts[npcName] = {
+				npc = npcToPreserve,
+				text = currentText,
+				timestamp = tick(),
+			}
+		end
+
+		for _, npc in ipairs(AllNPCs) do
+			if npc._connections and npc._connections.updateConnection then
+				npc._connections.updateConnection:Disconnect()
+				npc._connections.updateConnection = nil
+			end
+
+			if npc.FloatingText and npc.FloatingText.frame then
+				for _, child in ipairs(npc.FloatingText.frame:GetChildren()) do
+					if child:IsA("TextButton") then
+						child:Destroy()
+					end
+				end
+
+				local npcModelName = npc.model and npc.model.Name or ""
+				if npc ~= npcToPreserve and not _G.__FadingNPCTexts[npcModelName] then
+					FloatingTextUI.Hide(npc.FloatingText)
 				end
 			end
-
-			local npcModelName = npc.model and npc.model.Name or ""
-			if npc ~= npcToPreserve and not _G.__FadingNPCTexts[npcModelName] then
-				FloatingTextUI.Hide(npc.FloatingText)
-			end
 		end
-	end
 
-	if npcToPreserve and npcToPreserve.FloatingText then
-		if
-			not npcToPreserve._connections.updateConnection or not npcToPreserve._connections.updateConnection.Connected
-		then
-			npcToPreserve._connections.updateConnection = RunService.RenderStepped:Connect(function()
-				if npcToPreserve.FloatingText and npcToPreserve.FloatingText.frame then
-					local surfaceGui = npcToPreserve.FloatingText.frame.Parent
-					if surfaceGui then
-						local textPart = surfaceGui.Parent
-						if textPart and textPart:IsA("Part") then
-							FloatingTextUI.UpdateOrientation(textPart)
+		if npcToPreserve and npcToPreserve.FloatingText then
+			if
+				not npcToPreserve._connections.updateConnection
+				or not npcToPreserve._connections.updateConnection.Connected
+			then
+				npcToPreserve._connections.updateConnection = RunService.RenderStepped:Connect(function()
+					if npcToPreserve.FloatingText and npcToPreserve.FloatingText.frame then
+						local surfaceGui = npcToPreserve.FloatingText.frame.Parent
+						if surfaceGui then
+							local textPart = surfaceGui.Parent
+							if textPart and textPart:IsA("Part") then
+								FloatingTextUI.UpdateOrientation(textPart)
+							end
 						end
+					end
+				end)
+			end
+
+			local preservationTime = 4.0
+
+			task.delay(preservationTime, function()
+				local fadingInfo = _G.__FadingNPCTexts[npcName]
+				if not fadingInfo or (tick() - fadingInfo.timestamp) > 3.0 then
+					if ActiveDialogue and ActiveDialogue.currentNPC == npcToPreserve then
+						return
+					end
+
+					if npcToPreserve._connections.updateConnection then
+						npcToPreserve._connections.updateConnection:Disconnect()
+						npcToPreserve._connections.updateConnection = nil
+					end
+
+					if npcToPreserve.FloatingText and npcToPreserve.FloatingText.frame then
+						FloatingTextUI.Hide(npcToPreserve.FloatingText)
+					end
+
+					if _G.__FadingNPCTexts[npcName] then
+						_G.__FadingNPCTexts[npcName] = nil
 					end
 				end
 			end)
 		end
 
-		local preservationTime = 4.0
+		if hasRemainingDisplayTime then
+			local remainingTime = PlayerTextHideTimestamp - tick()
 
-		task.delay(preservationTime, function()
-			local fadingInfo = _G.__FadingNPCTexts[npcName]
-			if not fadingInfo or (tick() - fadingInfo.timestamp) > 3.0 then
-				if ActiveDialogue and ActiveDialogue.currentNPC == npcToPreserve then
-					return
+			task.delay(remainingTime, function()
+				if (ActiveDialogue :: any) == (self :: any) then
+					ActiveDialogue = nil
 				end
 
-				if npcToPreserve._connections.updateConnection then
-					npcToPreserve._connections.updateConnection:Disconnect()
-					npcToPreserve._connections.updateConnection = nil
+				if not ActiveDialogue then
+					ProximityPromptHandler.SetAllPromptsEnabled(true)
 				end
 
-				if npcToPreserve.FloatingText and npcToPreserve.FloatingText.frame then
-					FloatingTextUI.Hide(npcToPreserve.FloatingText)
+				if self.onDialogueEndCallback then
+					self.onDialogueEndCallback()
 				end
 
-				if _G.__FadingNPCTexts[npcName] then
-					_G.__FadingNPCTexts[npcName] = nil
+				if self.playerFloatingText and self.playerFloatingText.frame then
+					local surfaceGui = self.playerFloatingText.frame.Parent
+					if surfaceGui then
+						surfaceGui:Destroy()
+					end
+					local textPart = surfaceGui and surfaceGui.Parent
+					if textPart then
+						textPart:Destroy()
+					end
 				end
-			end
-		end)
-	end
 
-	if hasRemainingDisplayTime then
-		local remainingTime = PlayerTextHideTimestamp - tick()
-
-		task.delay(remainingTime, function()
+				PlayerTextHideTimestamp = 0
+			end)
+		else
 			if (ActiveDialogue :: any) == (self :: any) then
 				ActiveDialogue = nil
 			end
@@ -871,32 +907,18 @@ function DialogueSystem.EndDialogue(self: DialogueSystem)
 			end
 
 			PlayerTextHideTimestamp = 0
+		end
+	end
+
+	if self.isNPCTyping then
+		task.spawn(function()
+			while self.isNPCTyping do
+				task.wait(0.05)
+			end
+			finishEnd()
 		end)
 	else
-		if (ActiveDialogue :: any) == (self :: any) then
-			ActiveDialogue = nil
-		end
-
-		if not ActiveDialogue then
-			ProximityPromptHandler.SetAllPromptsEnabled(true)
-		end
-
-		if self.onDialogueEndCallback then
-			self.onDialogueEndCallback()
-		end
-
-		if self.playerFloatingText and self.playerFloatingText.frame then
-			local surfaceGui = self.playerFloatingText.frame.Parent
-			if surfaceGui then
-				surfaceGui:Destroy()
-			end
-			local textPart = surfaceGui and surfaceGui.Parent
-			if textPart then
-				textPart:Destroy()
-			end
-		end
-
-		PlayerTextHideTimestamp = 0
+		finishEnd()
 	end
 end
 
@@ -1056,6 +1078,8 @@ function DialogueSystem.ShowNPCText(self: DialogueSystem, text: string, callback
 		return
 	end
 
+	self.isNPCTyping = true
+
 	FloatingTextUI.UpdateText(self.currentNPC.FloatingText, "")
 	FloatingTextUI.Show(self.currentNPC.FloatingText)
 
@@ -1076,6 +1100,7 @@ function DialogueSystem.ShowNPCText(self: DialogueSystem, text: string, callback
 		if currentCharIndex < textLength then
 			task.delay(textSpeed, addNextChar)
 		else
+			self.isNPCTyping = false
 			if callback then
 				task.spawn(callback)
 			end
